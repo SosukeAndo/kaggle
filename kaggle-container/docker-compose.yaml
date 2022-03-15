@@ -13,3 +13,27 @@ services:
     ports:
       - "8888:8888"
     command: jupyter lab --ip=0.0.0.0 --allow-root --NotebookApp.token='' --port=8888
+  elasticsearch:
+    build:
+      dockerfile: ./elasticsearch/Dockerfile_es
+      context: .
+    environment:
+      - discovery.type=single-node
+      - cluster.name=docker-cluster
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - 9200:9200
+      - 9300:9300
+    volumes:
+      - ./elasticsearch/es-data:/usr/share/elasticsearch/data
+  kibana:
+    build:
+      dockerfile: ./elasticsearch/Dockerfile_kibana
+      context: .
+    ports:
+      - 5601:5601
